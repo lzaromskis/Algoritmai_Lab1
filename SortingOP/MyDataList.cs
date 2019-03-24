@@ -201,5 +201,105 @@ namespace SortingOP
             }
             return true;
         }
+
+        private void ElementCount(double element, ref int position, ref int count)
+        {
+            position = -1;
+            count = 0;
+            int i = 0;
+            for (MyLinkedListNode node = headNode; node != null; node = node.nextNode, i++)
+            {
+                if (Math.Abs(node.data - element) < 0.00001)
+                {
+                    if (position == -1)
+                        position = i;
+                    count++;
+                }
+            }
+        }
+
+        private double ElementCountBigger(double element, ref int position, ref int count)
+        {
+            position = -1;
+            count = 0;
+            double larger = double.PositiveInfinity;
+            int i = 0;
+            for (MyLinkedListNode node = headNode; node != null; node = node.nextNode, i++)
+            {
+                if (node.data > element)
+                {
+                    if (Math.Abs(node.data - larger) < 0.00001)
+                        count++;
+                    else if (node.data < larger)
+                    {
+                        position = i;
+                        count = 1;
+                        larger = node.data;
+                    }
+                }
+            }
+            return larger;
+        }
+
+        private double ElementCountBiggest(ref int position, ref int count)
+        {
+            position = -1;
+            count = 0;
+            double biggest = double.MinValue;
+            int i = 0;
+            for (MyLinkedListNode node = headNode; node != null; node = node.nextNode, i++)
+            {
+                if (Math.Abs(node.data - biggest) < 0.00001)
+                    count++;
+                else if (node.data > biggest)
+                {
+                    position = i;
+                    count = 1;
+                    biggest = node.data;
+                }
+            }
+            return biggest;
+        }
+
+        public void PrintRange(int left, int right)
+        {
+            if (left > right)
+            {
+                int tmp = left;
+                left = right;
+                right = tmp;
+            }
+            if (right > length)
+                right = length;
+            if (left < 0)
+                left = 0;
+
+            int i = 0;
+            for (MyLinkedListNode node = headNode; node != null && i < right; node = node.nextNode, i++)
+            {
+                if (i >= left)
+                    Console.Write(" {0:F5} ", node.data);
+            }
+                
+            Console.WriteLine();
+        }
+
+        public void PrintElement(double element)
+        {
+            int position = 0, count = 0;
+            ElementCount(element, ref position, ref count);
+            if (position == -1)
+            {
+                element = ElementCountBigger(element, ref position, ref count);
+                if (position == -1)
+                    element = ElementCountBiggest(ref position, ref count);
+            }
+            Console.WriteLine($"Element {element} is first found at index {position} and can be seen {count} times in the array.");
+        }
+
+        public void PrintAll()
+        {
+            Print(length);
+        }
     }
 }
