@@ -13,7 +13,8 @@ namespace SortingD
         static void Main(string[] args)
         {
             int seed = (int)DateTime.Now.Ticks & 0x0000FFFF;
-
+            Console.InputEncoding = Encoding.UTF8;
+            Console.OutputEncoding = Encoding.UTF8;
             // Antras etapas
             if (!Directory.Exists("tmp"))
                 Directory.CreateDirectory("tmp");
