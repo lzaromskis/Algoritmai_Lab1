@@ -9,60 +9,143 @@ namespace HashTableSearch
 {
     class Program
     {
-        //static void Main(string[] args)
-        //{
-        //    HashTable hash = new HashTable();
-        //    hash.Put("aaaa");
-        //    hash.Put("bbbb");
-        //    hash.Put("cccc");
-        //    hash.Put("dddd");
-        //    hash.Put("eeee");
-        //    hash.Put("ffff");
-        //    hash.Put("gggg");
-        //    hash.Put("hhhh");
-        //    hash.Put("iiii");
-        //    hash.Put("jjjj");
-        //    hash.Put("kkkk");
-        //    hash.Put("llll");
-        //    hash.Put("mmmm");
-        //    hash.Put("nnnn");
-        //    hash.Put("oooo");
-        //    hash.Put("pppp");
 
-        //    string[] s = hash.ToVisualizedString();
+        static HashTable GlobalTable = null;
 
-        //    foreach (string ss in s)
-        //    {
-        //        Console.WriteLine(ss);
-        //    }
+        static void TextUserInterface()
+        {
+            bool isWorking = true;
+            char key;
+            while (isWorking)
+            {
+                PrintActionList();
+                key = Console.ReadKey().KeyChar;
+                switch (key)
+                {
+                    case '1':
+                        Generate();
+                        break;
+                    case '2':
+                        Print();
+                        break;
+                    case '3':
+                        ChainCount();
+                        break;
+                    case '4':
+                        InSameChain();
+                        break;
+                    case '0':
+                        isWorking = false;
+                        break;
+                }
 
-        //    Console.WriteLine();
-        //    Console.WriteLine(hash.Get("aaaa"));
-        //    Console.WriteLine(hash.Get("bbbb"));
-        //    Console.WriteLine(hash.Get("cccc"));
-        //    Console.WriteLine(hash.Get("dddd"));
-        //    Console.WriteLine(hash.Get("eeee"));
-        //    Console.WriteLine(hash.Get("ffff"));
-        //    Console.WriteLine(hash.Get("gggg"));
-        //    Console.WriteLine(hash.Get("hhhh"));
-        //    Console.WriteLine(hash.Get("iiii"));
-        //    Console.WriteLine(hash.Get("jjjj"));
-        //    Console.WriteLine(hash.Get("kkkk"));
-        //    Console.WriteLine(hash.Get("llll"));
-        //    Console.WriteLine(hash.Get("mmmm"));
-        //    Console.WriteLine(hash.Get("nnnn"));
-        //    Console.WriteLine(hash.Get("oooo"));
-        //    Console.WriteLine(hash.Get("pppp"));
-        //}
+            }
+        }
+
+        static void PrintActionList()
+        {
+            Console.WriteLine("\n1 - Sugeneruoti maišos lentelę;  2 - Išvesti maišos lentelę;\n3 - Išvesti grandinėlių skaičių;  4 - Patikrinti ar du įrašai yra vienoje grandinėlėje;\n0 - Baigti darbą");
+        }
+
+        static void Generate()
+        {
+            Console.WriteLine("\nĮveskie elementų kiekį:");
+            int n = ReadPositiveInteger();
+            GlobalTable = new HashTable((int)((float)n / 0.75f), 0.8f);
+            for (int j = 0; j < n; j++)
+            {
+                string s = RandomName(10);
+                GlobalTable.Put(s, s);
+            }
+        }
+
+        static int ReadPositiveInteger()
+        {
+            while (true)
+            {
+                string line = Console.ReadLine();
+                int size;
+                if (int.TryParse(line, out size))
+                {
+                    if (size > 0)
+                    {
+                        return size;
+                    }
+                }
+                Console.WriteLine("\nĮveskite teigiamą sveikąjį skaičių.");
+            }
+        }
+
+        static bool CheckIfNull()
+        {
+            if (GlobalTable == null)
+            {
+                Console.WriteLine("\nMaišos lentelė turi būti sugeneruota!");
+                return true;
+            }
+            return false;
+        }
+
+        static void Print()
+        {
+            if (CheckIfNull())
+                return;
+            Console.WriteLine();
+            GlobalTable.Print();
+        }
+
+        static void ChainCount()
+        {
+            if (CheckIfNull())
+                return;
+            int count = GlobalTable.GetNumberOfChains();
+            Console.WriteLine($"\nMaišos lentelėje iš viso yra {count} grandinėlių.");
+        }
+
+        static void InSameChain()
+        {
+            if (CheckIfNull())
+                return;
+            Console.WriteLine("\nĮveskite pirmąjį raktą:");
+            string key1 = ReadString();
+            Console.WriteLine("\nĮveskite antrąjį raktą:");
+            string key2 = ReadString();
+            int hash1, hash2;
+            GlobalTable.IsInSameChain(key1, key2, out hash1, out hash2);
+            if (GlobalTable.IsInSameChain(key1, key2, out hash1, out hash2))
+               Console.WriteLine($"Raktai yra toje pačioje grandinėlėje, nes hash1 = {hash1}, o hash2 = {hash2}.");
+            else
+               Console.WriteLine($"Raktai nėra toje pačioje grandinėlėje, nes hash1 = {hash1}, o hash2 = {hash2}.");
+        }
+
+        static string ReadString()
+        {
+            string line;
+            while (true)
+            {
+                line = Console.ReadLine();
+                if (line.Length != 10)
+                    Console.WriteLine("\nRaktas sudarytas iš 10 simbolių.");
+                else
+                    return line;
+            }
+        }
+
         static Random random;
         static void Main(string[] args)
         {
+            int seed = (int)DateTime.Now.Ticks & 0x0000FFFF;
+            random = new Random(seed);
+            Console.InputEncoding = Encoding.UTF8;
+            Console.OutputEncoding = Encoding.UTF8;
+            TextUserInterface();
+            return;
+
             List<string> nameList = new List<string>();
             List<string> data = new List<string>();
             int[] amount = { 100000, 150000, 200000, 250000, 300000, 400000, 500000, 750000, 1000000, 1250000 };
             int repeat = 10;
-            int seed = (int)DateTime.Now.Ticks & 0x0000FFFF;
-            random = new Random(seed);
+            
             long startTime = 0;
             long endTime = 0;
             data.Add("HASH TABLE\n");
