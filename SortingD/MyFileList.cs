@@ -363,5 +363,105 @@ namespace SortingD
             return true;
         }
 
+        private void ElementCount(double element, ref int position, ref int count)
+        {
+            position = -1;
+            count = 0;
+            int i = 0;
+            for (int node = ReadHead(); node != 0; node = node = ReadNextNode(node), i++)
+            {
+                if (Math.Abs(ReadValue(node) - element) < 0.00001)
+                {
+                    if (position == -1)
+                        position = i;
+                    count++;
+                }
+            }
+        }
+
+        private double ElementCountBigger(double element, ref int position, ref int count)
+        {
+            position = -1;
+            count = 0;
+            double larger = double.PositiveInfinity;
+            int i = 0;
+            for (int node = ReadHead(); node != 0; node = node = ReadNextNode(node), i++)
+            {
+                if (ReadValue(node) > element)
+                {
+                    if (Math.Abs(ReadValue(node) - larger) < 0.00001)
+                        count++;
+                    else if (ReadValue(node) < larger)
+                    {
+                        position = i;
+                        count = 1;
+                        larger = ReadValue(node);
+                    }
+                }
+            }
+            return larger;
+        }
+
+        private double ElementCountBiggest(ref int position, ref int count)
+        {
+            position = -1;
+            count = 0;
+            double biggest = double.MinValue;
+            int i = 0;
+            for (int node = ReadHead(); node != 0; node = node = ReadNextNode(node), i++)
+            {
+                if (Math.Abs(ReadValue(node) - biggest) < 0.00001)
+                    count++;
+                else if (ReadValue(node) > biggest)
+                {
+                    position = i;
+                    count = 1;
+                    biggest = ReadValue(node);
+                }
+            }
+            return biggest;
+        }
+
+        public void PrintRange(int left, int right)
+        {
+            if (left > right)
+            {
+                int tmp = left;
+                left = right;
+                right = tmp;
+            }
+            if (right > length)
+                right = length;
+            if (left < 0)
+                left = 0;
+
+            int i = 0;
+            for (int node = ReadHead(); node != 0 && i < right; node = ReadNextNode(node), i++)
+            {
+                if (i >= left)
+                    Console.Write(" {0:F5} ", ReadValue(node));
+            }
+
+            Console.WriteLine();
+        }
+
+        public void PrintElement(double element)
+        {
+            int position = 0, count = 0;
+            ElementCount(element, ref position, ref count);
+            if (position == -1)
+            {
+                element = ElementCountBigger(element, ref position, ref count);
+                if (position == -1)
+                    element = ElementCountBiggest(ref position, ref count);
+            }
+            Console.WriteLine($"Element {element} is first found at index {position} and can be seen {count} times in the array.");
+        }
+
+        public void PrintAll()
+        {
+            Print(length);
+        }
+
     }
 }
