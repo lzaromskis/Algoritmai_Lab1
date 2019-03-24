@@ -15,7 +15,203 @@ namespace SortingD
             int seed = (int)DateTime.Now.Ticks & 0x0000FFFF;
 
             // Antras etapas
-            Test_Array_List(seed);
+            if (!Directory.Exists("tmp"))
+                Directory.CreateDirectory("tmp");
+            //Test_Array_List(seed);
+            TextUserInterface(seed);
+        }
+
+        static MyFileArray GlobalArray = null;
+        static MyFileList GlobalList = null;
+
+        static void TextUserInterface(int seed)
+        {
+            bool isWorking = true;
+            char key;
+            while (isWorking)
+            {
+                PrintActionList();
+                key = Console.ReadKey().KeyChar;
+                switch (key)
+                {
+                    case '1':
+                        Generate(seed);
+                        break;
+                    case '2':
+                        Print();
+                        break;
+                    case '3':
+                        Sort();
+                        break;
+                    case '4':
+                        GetInfoAboutElement();
+                        break;
+                    case '0':
+                        isWorking = false;
+                        break;
+                }
+
+            }
+
+        }
+
+        static void PrintActionList()
+        {
+            Console.Write("\n1 - Sugeneruoti naują;  2 - Išvesti;\n3 - Rikiuoti;  4 - Surasti elementą;\n0 - Baigti darbą;\n");
+        }
+
+        static char GetAction(bool notNull)
+        {
+            char key;
+            while (true)
+            {
+                Console.WriteLine("\n1 - Masyvas;  2 - Sąrašas;  3 - Abu;  0 - Atšaukti");
+                key = Console.ReadKey().KeyChar;
+                if (key == '1' || key == '2' || key == '3' || key == '0')
+                {
+                    if (notNull)
+                    {
+                        if (GlobalArray == null && (key == '1' || key == '3'))
+                            Console.WriteLine("\nMasyvas turi būti sugeneruotas!");
+                        else if (GlobalList == null && (key == '2' || key == '3'))
+                            Console.WriteLine("\nSąrašas turi būti sigeneruotas");
+                        else
+                            return key;
+                    }
+                    else
+                        return key;
+                }
+            }
+        }
+
+        static void Generate(int seed)
+        {
+            char key = GetAction(false);
+            if (key == '0')
+                return;
+            Console.WriteLine("\nĮveskite dydį:");
+            int size = ReadPositiveInteger();
+            if (key == '1' || key == '3')
+            {
+                if (GlobalArray != null)
+                {
+                    GlobalArray.fs.Dispose();
+                }
+                GlobalArray = new MyFileArray("array.dat", size, seed);
+                GlobalArray.fs = new FileStream("array.dat", FileMode.Open, FileAccess.ReadWrite);
+            }
+            if (key == '2' || key == '3')
+            {
+                if (GlobalList != null)
+                {
+                    GlobalList.fs.Dispose();
+                }
+                GlobalList = new MyFileList("list.dat", size, seed);
+                GlobalList.fs = new FileStream("list.dat", FileMode.Open, FileAccess.ReadWrite);
+            }
+        }
+
+        static void Print()
+        {
+            char key = GetAction(true);
+            if (key == '0')
+                return;
+            char print;
+            while (true)
+            {
+                Console.WriteLine("\n1 - Visą;  2 - Dalį;");
+                print = Console.ReadKey().KeyChar;
+                if (print == '1' || print == '2')
+                    break;
+            }
+            if (print == '1')
+            {
+                Console.WriteLine();
+                if (key == '1' || key == '3')
+                    GlobalArray.PrintAll();
+                if (key == '2' || key == '3')
+                    GlobalList.PrintAll();
+            }
+            if (print == '2')
+            {
+                Console.WriteLine("\nĮveskite kairinę ribą (įskaitant):");
+                int left = ReadPositiveInteger();
+                Console.WriteLine("\nĮveskite dešininę ribą (neįskaitant):");
+                int right = ReadPositiveInteger();
+                Console.WriteLine();
+                if (key == '1' || key == '3')
+                    GlobalArray.PrintRange(left, right);
+                if (key == '2' || key == '3')
+                    GlobalList.PrintRange(left, right);
+            }
+        }
+
+        static int ReadPositiveInteger()
+        {
+            while (true)
+            {
+                string line = Console.ReadLine();
+                int size;
+                if (int.TryParse(line, out size))
+                {
+                    if (size > 0)
+                    {
+                        return size;
+                    }
+                }
+                Console.WriteLine("\nĮveskite teigiamą sveikąjį skaičių.");
+            }
+        }
+
+        static void Sort()
+        {
+            char key = GetAction(true);
+            if (key == '0')
+                return;
+            char sort;
+            while (true)
+            {
+                Console.WriteLine("\n1 - MergeSort;  2 - BucketSort;");
+                sort = Console.ReadKey().KeyChar;
+                if (sort == '1' || sort == '2')
+                    break;
+            }
+            if (sort == '1')
+            {
+                if (key == '1' || key == '3')
+                    MergeSort(GlobalArray);
+                if (key == '2' || key == '3')
+                    GlobalList.MergeSort();
+            }
+            if (sort == '2')
+            {
+                if (key == '1' || key == '3')
+                    BucketSort(GlobalArray);
+                if (key == '2' || key == '3')
+                    GlobalList.BucketSort();
+            }
+        }
+
+        static void GetInfoAboutElement()
+        {
+            char key = GetAction(true);
+            if (key == '0')
+                return;
+            double element;
+            Console.WriteLine("\nĮveskitę elementą:");
+            while (true)
+            {
+                string line = Console.ReadLine();
+                if (double.TryParse(line, out element))
+                {
+                    break;
+                }
+                Console.WriteLine("\nĮveskitę tinkąmą realujį skaičių.");
+            }
+            if (key == '1' || key == '3')
+                GlobalArray.PrintElement(element);
+            if (key == '2' || key == '3')
+                GlobalList.PrintElement(element);
         }
 
         public static void MergeSort(MyFileArray input)
